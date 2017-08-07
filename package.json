@@ -1,0 +1,16 @@
+{
+  "name": "heroes-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:tpucci/graphql-api.git",
+  "author": "Thomas Pucci <thomas.lb.pucci@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev:install": "docker-compose -f docker-compose.yml build",
+    "dev:up": "docker-compose -f docker-compose.yml up",
+    "dev:down": "docker-compose -f docker-compose.yml down",
+    "dev:uninstall": "docker-compose -f docker-compose.yml down --rmi all",
+    "dev:connect:api": "docker exec -it target_api_1 /bin/sh",
+    "dev:connect:db": "psql -h localhost -p 5431 -U myappuser -d myappdb"
+  }
+}

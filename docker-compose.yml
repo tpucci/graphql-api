@@ -1,0 +1,22 @@
+version: '3'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    image: heroes-api
+    env_file: config.env
+    volumes:
+      - ./api:/usr/src/api
+    ports:
+      - 8080:8080
+    links:
+      - db:db
+  db:
+    build:
+      context: .
+      dockerfile: db/Dockerfile
+    env_file: config.env
+    image: heroes-db
+    ports:
+      - 5431:5432
