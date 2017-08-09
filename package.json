@@ -10,7 +10,7 @@
     "dev:up": "docker-compose -f docker-compose.yml up",
     "dev:down": "docker-compose -f docker-compose.yml down",
     "dev:uninstall": "docker-compose -f docker-compose.yml down --rmi all",
-    "dev:connect:api": "docker exec -it target_api_1 /bin/sh",
+    "dev:connect:api": "docker exec -it graphqlapi_api_1 /bin/sh",
     "dev:connect:db": "psql -h localhost -p 5431 -U myappuser -d myappdb"
   }
 }

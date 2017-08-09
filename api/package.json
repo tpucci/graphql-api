@@ -4,9 +4,17 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "graphql-server-koa": "^1.0.5",
+    "koa": "^2.3.0",
+    "koa-router": "^7.2.1",
+    "koa-views": "^6.0.2",
     "nodemon": "^1.11.0"
   },
   "scripts": {
-    "serve": "nodemon index.js"
+    "serve": "nodemon index.js --exec babel-node --presets es2015"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1"
   }
 }

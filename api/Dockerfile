@@ -2,5 +2,5 @@ FROM node:8.1.0-alpine
 
 WORKDIR /usr/src/api
 
-EXPOSE 8080
+EXPOSE 3000
 CMD ["yarn", "run", "serve"]
