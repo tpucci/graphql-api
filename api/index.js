@@ -1,11 +1,14 @@
 import Koa from 'koa';
 import koaRouter from 'koa-router';
+import koaBody from 'koa-bodyparser';
 import { graphqlKoa } from 'graphql-server-koa';
 
-import schema from 'presentation/schema';
+import schema from './presentation/schema';
 
 const app = new Koa();
 const router = new koaRouter();
+
+app.use(koaBody());
 
 router.get('/', ctx => {
   ctx.body = 'Hello World!';
@@ -16,7 +19,7 @@ router.post(
   graphqlKoa(async ctx => {
     return {
       schema: schema,
-      context,
+      context: {},
       debug: true,
     };
   })
