@@ -4,8 +4,6 @@ exports.up = function(knex, Promise) {
     table.increments('id');
     table.string('firstName');
     table.string('lastName');
-    table.string('heroName');
-    table.timestamps();
   });
 };
 
