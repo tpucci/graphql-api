@@ -1,3 +1,4 @@
+import DataLoader from 'dataloader';
 import HeroDB from '../db/queryBuilders/hero';
 
 class Hero {
@@ -15,15 +16,27 @@ class Hero {
     this.enemyId = data.enemyId;
   }
 
+  static getLoaders() {
+    const getById = new DataLoader(ids => HeroDB.getByIds(ids));
+    const primeLoaders = (heroes) => {
+      heroes.forEach(hero =>
+        getById.clear(hero.id).prime(hero.id, hero))
+      ;
+    };
+    return { getById, primeLoaders };
+  }
+
   static async load(ctx, args) {
-    const data = await HeroDB.getById(args.id);
+    if (!args.id) return null;
+    const data = await ctx.dataLoaders.hero.getById.load(args.id);
     if (!data) return null;
 
     return new Hero(data);
   }
 
-  static async loadAll({ authToken, dataLoaders }) {
+  static async loadAll(ctx, args) {
     const data = await HeroDB.getAll();
+    ctx.dataLoaders.hero.primeLoaders(data);
 
     return data.map(row => new Hero(row));
   }
