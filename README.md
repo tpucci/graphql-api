@@ -2,11 +2,11 @@
 
 ## Owner: [Thomas Pucci](https://github.com/tpucci)
 
-## Prerequisites (~5min)
+## Prerequisites (~12min)
 
-- Have **Yarn** installed (~1min)
-- Have **Docker** and **Docker-compose** installed (~3min)
-- Have **Postman** installed (~1min)
+- Have [**Yarn**](https://yarnpkg.com/en/docs/install) installed (~5min)
+- Have [**Docker**](https://docs.docker.com/engine/installation/) and **Docker-compose** installed (~5min)
+- Have [**Postman**](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop) installed (~2min)
 
 ## Context
 
@@ -15,9 +15,11 @@ We will have a Hero model with superheroes real and hero names. We will add one 
 
 Our API will be lightly protected and use batching to minimise DB round-trips.
 
-## Steps
+## Steps (~39min)
 
-### Intialise a new project
+> **Note**: You should commit between each step.
+
+### Intialise a new project (~4min)
 
 - Create and go to a new directory for the project: `mkdir graphql_formation && cd graphql_formation`
 - Init a git repository: `git init`
@@ -66,6 +68,8 @@ Our API will be lightly protected and use batching to minimise DB round-trips.
         context: ./db
       env_file: config.env
       image: heroes-db
+      ports:
+        - 5431:5432
   ```
   - In a new `config.env` file, declare your environnement variable for these Docker containers:
   ```
@@ -73,6 +77,7 @@ Our API will be lightly protected and use batching to minimise DB round-trips.
   POSTGRES_PASSWORD=heroespassword
   POSTGRES_DB=heroesdb
   PGDATA=/data
+  DB_HOST=db
   ```
 - Build these services with the command: `docker-compose build`
 
@@ -82,7 +87,7 @@ Our API will be lightly protected and use batching to minimise DB round-trips.
 >
 > `Successfully tagged heroes-api:latest`
 
-### Install nodemon and run our project
+### Install nodemon and run our project (~3min)
 
 - Add this to the project .gitignore: `echo "api/node_modules" > .gitignore`
 - In the `api` folder, interactively create a `package.json` file: `cd api && yarn init`
@@ -101,13 +106,12 @@ Our API will be lightly protected and use batching to minimise DB round-trips.
 >
 > **CHECK 2**: From another terminal, you can access the api and see the following folder structure: `docker-compose exec api /bin/sh` then inside the container: `ls -lath`;
 > ```
-> total 64
-> drwxrwxr-x    3 node     node        4.0K Aug  9 09:00 .
-> -rw-rw-r--    1 node     node         186 Aug  9 09:00 package.json
-> -rw-rw-r--    1 node     node       42.1K Aug  9 09:00 yarn.lock
-> -rw-rw-r--    1 node     node           0 Aug  7 20:05 index.js
-> drwxrwxr-x  138 node     node        4.0K Aug  7 20:04 node_modules
-> -rw-rw-r--    1 node     node          86 Aug  7 20:03 Dockerfile
+> drwxrwxr-x    3 node     node        4.0K Aug 17 12:37 .
+> -rw-rw-r--    1 node     node           0 Aug 17 12:37 index.js
+> drwxrwxr-x  222 node     node       12.0K Aug 17 12:37 node_modules
+> -rw-rw-r--    1 node     node         426 Aug 17 12:37 package.json
+> -rw-rw-r--    1 node     node       66.2K Aug 17 12:37 yarn.lock
+> -rw-rw-r--    1 node     node          86 Aug 17 12:32 Dockerfile
 > drwxr-xr-x    3 root     root        4.0K Aug  3 11:50 ..
 > ```
 > Exit with: `CTRL-D`
@@ -119,9 +123,9 @@ Our API will be lightly protected and use batching to minimise DB round-trips.
 > Exit with: `CTRL-D`
 
 
-### Create a koa server
+### Create a koa server (~2min)
 
-- Install koa and koa-router in our api: `cd api & yarn add koa koa-router`
+- Install koa and koa-router in our api: `cd api && yarn add koa koa-router`
 - In the `index.js` file, create our server:
 ```js
 import Koa from 'koa';
@@ -145,7 +149,7 @@ console.log('Server is up and running');
 >
 > **CHECK 2**: Hitting `localhost:3000` should return `Hello World!`: `curl localhost:3000`
 
-### Create a presentation layer with graphQL
+### Create a presentation layer with graphQL (~4min)
 
 > This layer will let our api know how to present data: what data one user can query ? How should he query this data (fields, root queries, sub queries...) ?
 
@@ -200,7 +204,7 @@ const resolvers = {
         lastName: 'Wayne',
       }
     ]),
-  }
+  },
 }
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
@@ -248,9 +252,9 @@ router.post(
 > ```
 > ...should return our two heroes, Clark and Bruce:
 
-### Create a business layer
+### Create a business layer (~3min)
 
-> This layer will contain all business logic: access controll, scoping / whitelisting, batching and caching and computed properties. More explanations can be found [here, in the bam-api repo](https://github.com/bamlab/bam-api). In this MO, we will only cover access control logic and batching and caching.
+> This layer will contain all business logic: access controll, scoping / whitelisting, batching and caching and computed properties. More explanations can be found [here, in the bam-api repo](https://github.com/bamlab/bam-api). In this MO, we will only cover access control logic and batching.
 
 - In a new `business` folder add a new `hero.js` file describing our class for this business object:
 ```js
@@ -362,9 +366,9 @@ const resolvers = {
 > ```
 > ...should return Bruce Wayne with its `id: 2`.
 
-### Seed our database
+### Seed our database (~5min)
 
-- Install `knex` and `pg`: `yarn add knex pg`
+- Install `knex` and `pg` at the root of the project: `cd .. && yarn add knex pg`
 - At the root of our project, add a `knexfile.js` file:
 ```js
 module.exports = {
@@ -372,6 +376,7 @@ module.exports = {
     client: 'pg',
     connection: {
       host: 'localhost',
+      port: 5431,
       user: 'heroesuser',
       password: 'heroespassword',
       database: 'heroesdb',
@@ -406,10 +411,10 @@ exports.seed = function(knex, Promise) {
   return knex('Heroes').del()
     .then(function () {
       return knex('Heroes').insert([
-        {id: 1, firstName: 'Clark', lastName: 'Kent'},
-        {id: 2, firstName: 'Bruce', lastName: 'Wayne'},
-        {id: 3, firstName: 'Peter', lastName: 'Parker'},
-        {id: 4, firstName: 'Susan', lastName: 'Storm-Richards'},
+        {id: 1, firstName: 'Clark', lastName: 'Kent', heroName: 'Superman'},
+        {id: 2, firstName: 'Bruce', lastName: 'Wayne', heroName: 'Batman'},
+        {id: 3, firstName: 'Peter', lastName: 'Parker', heroName: 'Spiderman'},
+        {id: 4, firstName: 'Susan', lastName: 'Storm-Richards', heroName: 'Invisible Woman'},
       ]);
     });
 };
@@ -428,12 +433,12 @@ exports.seed = function(knex, Promise) {
 > ```
 > Exit with: `CTRL-D`
 
-### Create a db layer with knex
+### Create a db layer with knex (~4min)
 
 > This layer let our api query the data using knex query builder.
 
-- Install `knex` and `pg`: `yarn add knex pg`
-- In a new `db` folder add a new `index.js` file:
+- Install `knex` and `pg` in our api: `cd api && yarn add knex pg`
+- In the `db` folder add a new `index.js` file:
 ```js
 import knex from 'knex';
 
@@ -461,14 +466,14 @@ class Hero {
     .where('id', id);
   }
 
-  static async getByIds(ids: Array<number>): Promise<Array<CostDBType>> {
+  static async getByIds(ids: Array<number>) {
     return db
     .select()
     .table('Heroes')
     .whereIn('id', ids);
   }
 
-  static async getAll(): Promise<Array<CostDBType>> {
+  static async getAll() {
     return db
     .select()
     .table('Heroes');
@@ -537,23 +542,21 @@ export default Hero;
 > ```
 > ...should return all 4 heroes of our database.
 
-### Add association to our api
+### Add association to our api (~4min)
 
 > Association are made both in our db and in our api, in our presentation layer.
 
-- Create a new migration: `yarn knex migrate:make add_heroes_heroname_and_enemy`
+- Create a new migration: `cd .. && yarn knex migrate:make add_heroes_enemies`
 - Complete the newly created migration file with this:
 ```js
 exports.up = function(knex, Promise) {
   return knex.schema.table('Heroes', function(table) {
-    table.string('heroName');
     table.integer('enemyId').references('id').inTable('Heroes');
   });
 };
 
 exports.down = function(knex, Promise) {
   return knex.schema.table('Heroes', function(table) {
-    table.dropColumn('enemyId');
     table.dropColumn('heroName');
   });
 };
@@ -631,7 +634,7 @@ const resolvers = {
 > ```
 > ...should return Clark Kent with its heroName and its enemy: Batman.
 
-### Push your api to the next level: use caching with Dataloader
+### Push your api to the next level: use caching with Dataloader (~4min)
 
 > Trying to query heroes and their enemies'heroName will show up a N+1 problem. Indeed, our api make 5 round-trips to our database! Try yourself:
 > ```json
@@ -641,7 +644,7 @@ const resolvers = {
 > ```
 > We can reduce these calls adding caching to our business layer
 
-- Install `Dataloader`: `yarn add dataloader`
+- Install `Dataloader`: `cd api && yarn add dataloader`
 - Add a `getLoaders` method to our `hero.js` file in our business layer:
 ```js
 import DataLoader from 'dataloader';
@@ -747,7 +750,7 @@ router.post(
 > ```
 > ...should return Clark Kent and Bruce Wayne; and only one *SELECT* call should have beeen made to our DB.
 
-### Add access control to our api
+### Add access control to our api (~3min)
 
 > This is a very simple example, for a more advanced solution, prefer using [Koa Jwt](https://github.com/koajs/jwt).
 
@@ -838,7 +841,7 @@ router.post(
 >
 > ![](assets/authorization.png)
 
-### Troubleshooting: Accessing data by id in the correct order
+### Troubleshooting: Accessing data by id in the correct order (~3min)
 
 > You should notice that in **Postman** making a *POST* request to `localhost:3000/api` which content-type is *JSON(application/json)* and *Authorization Header* is `Bearer authorized` with the following raw body:
 > ```json
@@ -870,7 +873,7 @@ class Hero {
     return db
     .select()
     .table('Heroes')
-    .whereIn('id', ids)
++    .whereIn('id', ids)
 +    .orderByRaw(orderByArgIdsOrder(ids));
   }
 ```
