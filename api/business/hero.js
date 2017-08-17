@@ -1,4 +1,5 @@
 import DataLoader from 'dataloader';
+import { verifyToken } from '../utils';
 import HeroDB from '../db/queryBuilders/hero';
 
 class Hero {
@@ -27,6 +28,8 @@ class Hero {
   }
 
   static async load(ctx, args) {
+    await verifyToken(ctx.authToken);
+
     if (!args.id) return null;
     const data = await ctx.dataLoaders.hero.getById.load(args.id);
     if (!data) return null;
@@ -35,6 +38,8 @@ class Hero {
   }
 
   static async loadAll(ctx, args) {
+    await verifyToken(ctx.authToken);
+
     const data = await HeroDB.getAll();
     ctx.dataLoaders.hero.primeLoaders(data);
 

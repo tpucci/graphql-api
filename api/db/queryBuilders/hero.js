@@ -1,5 +1,6 @@
 // @flow
 import db from '..';
+import { orderByArgIdsOrder } from '../../utils';
 
 class Hero {
   static async getById(id: number) {
@@ -13,7 +14,8 @@ class Hero {
     return db
     .select()
     .table('Heroes')
-    .whereIn('id', ids);
+    .whereIn('id', ids)
+    .orderByRaw(orderByArgIdsOrder(ids));
   }
 
   static async getAll(): Promise<Array<CostDBType>> {

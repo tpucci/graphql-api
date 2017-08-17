@@ -1,16 +1,13 @@
 export const parseAuthorizationHeader = (req) => {
-  const header = req.get('Authorization');
+  const header = req.headers.authorization;
 
   if (typeof header === 'undefined' || header === 'null') {
-    return {};
+    return null;
   }
 
   const [, scheme, token] = (/(\w+) ([\w.-]+)/g).exec(header);
 
-  return {
-    scheme,
-    token,
-  };
+  return token;
 };
 
 // Not production-ready: this is a simple example for the tutorial
@@ -22,3 +19,6 @@ export const verifyToken = token => new Promise((resolve, reject) => {
   }
   resolve();
 });
+
+export const orderByArgIdsOrder = ids => ("array_position(string_to_array(?, ',')::integer[], id)", ids.join(','));
+
